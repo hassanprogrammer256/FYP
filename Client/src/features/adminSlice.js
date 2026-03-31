@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/api';
+import { API_BASE_URL } from '../config';
+import axios from 'axios'
 
 // Async thunks
 export const fetchAllStudents = createAsyncThunk(
   'admin/fetchAllStudents',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/admin/all_students/');
+      const response = await axios.get(`${API_BASE_URL}accounts/students/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch students');
@@ -18,7 +19,7 @@ export const assignSupervisor = createAsyncThunk(
   'admin/assignSupervisor',
   async ({ studentId, supervisorId }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/admin/assign_supervisor/', {
+      const response = await axios.post(`${API_BASE_URL}admin/assign-supervisor/`, {
         student_id: studentId,
         supervisor_id: supervisorId,
       });
@@ -33,7 +34,7 @@ export const createProject = createAsyncThunk(
   'admin/createProject',
   async (projectData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/admin/create_project/', projectData);
+      const response = await api.post(`${API_BASE_URL}admin/create-project/`, projectData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create project');
@@ -45,7 +46,7 @@ export const fetchAllSupervisors = createAsyncThunk(
   'admin/fetchAllSupervisors',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/supervisor/');
+      const response = await api.get(`${API_BASE_URL}accounts/supervisor/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch supervisors');
@@ -57,7 +58,7 @@ export const fetchAllCourses = createAsyncThunk(
   'admin/fetchAllCourses',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/course/');
+      const response = await api.get(`${API_BASE_URL}accounts/course/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch courses');
@@ -69,7 +70,7 @@ export const fetchAllFaculties = createAsyncThunk(
   'admin/fetchAllFaculties',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/faculty/');
+      const response = await api.get(`${API_BASE_URL}accounts/faculty/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch faculties');
@@ -81,7 +82,7 @@ export const updateAdminProfile = createAsyncThunk(
   'admin/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await api.put('/admin/update_profile/', profileData);
+      const response = await api.put('`${API_BASE_URL}accounts/update-profile/`', profileData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update profile');
@@ -93,7 +94,7 @@ export const fetchAdminDetails = createAsyncThunk(
   'admin/fetchDetails',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/admin/details/');
+      const response = await api.get(`${API_BASE_URL}admin/details/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch admin details');

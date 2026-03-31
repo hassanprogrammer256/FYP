@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 const LogIn = () => {
-  const role = localStorage.getItem('role') || ''
  const dispatch= useDispatch()
  const  [isloading,setIsloading] = useState(false)
   const userData = {username: '', password: ''}
@@ -38,11 +37,11 @@ const navigate = useNavigate()
 if (data?.payload?.success) {
   setIsloading(false)
   addToast({message:'Logged in successfully',variant:'success'})
-  if( role === 'student') {
-    navigate('/student/dashboard')
+  if( data.payload.user.role === 'student') {
+    navigate('/student')
   }
-  if( role === 'supervisor') {
-    navigate('/supervisor/dashboard')
+  if( data.payload.user.role === 'supervisor') {
+    navigate('/supervisor')
   }
 
 

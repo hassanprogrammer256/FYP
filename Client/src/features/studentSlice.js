@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/api';
 import { API_BASE_URL } from '../config';
 
 // Async thunks
@@ -7,7 +6,8 @@ export const fetchStudentProjects = createAsyncThunk(
   'student/fetchProjects',
   async (studentId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/student/projects/?student_id=${studentId}`);
+      const reg_no = localstorage.getItem('reg_no','')
+      const response = await axios.get(`${API_BASE_URL}accounts/students/${reg_no}/project/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch projects');
@@ -19,7 +19,7 @@ export const submitActivity = createAsyncThunk(
   'student/submitActivity',
   async ({ studentId, activityId, fileData }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/student/submit_activity/', {
+      const response = await axios.post(`${API_BASE_URL}accounts/activity/`, {
         student_id: studentId,
         activity_id: activityId,
         file_data: fileData,
@@ -34,8 +34,9 @@ export const submitActivity = createAsyncThunk(
 export const fetchSubmissions = createAsyncThunk(
   'student/fetchSubmissions',
   async (studentId, { rejectWithValue }) => {
+    const reg_no = localStorage.getItem('reg_no','')
     try {
-      const response = await api.get(`/student/submissions/?student_id=${studentId}`);
+      const response = await axios.get(`${API_BASE_URL}accounts/students/${reg_no}/activity`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch submissions');
@@ -47,7 +48,8 @@ export const fetchFeedbacks = createAsyncThunk(
   'student/fetchFeedbacks',
   async (studentId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/student/feedbacks/?student_id=${studentId}`);
+      const reg_no = localStorage.getItem('reg_no','')
+      const response = await api.get(`${API_BASE_URL}accounts/students/${reg_no}/feedbacks/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch feedbacks');
@@ -59,7 +61,7 @@ export const updateStudentProfile = createAsyncThunk(
   'student/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await api.put('/student/update_profile/', profileData);
+      const response = await axios.put(,`${API_BASE_URL}accounts/students/${reg_no}/` profileData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update profile');
@@ -82,13 +84,7 @@ export const fetchStudentDetails = createAsyncThunk(
 
 export const fetchDashboardData = createAsyncThunk(
   'auth/fetchDashboard',
-  async (_, { getState, rejectWithValue }) => {
-    const { auth } = getState();
-    const { user } = auth;
-    console.log('Fetching dashboard data for user:', user)
-    if (!user) return rejectWithValue('No user found');
-    console.log('No user found')
-    
+  async (_, {rejectWithValue }) => {
     try {
       let endpoint = '';
       const reg_no  = localStorage.getItem('reg_no') || null;
@@ -101,7 +97,7 @@ export const fetchDashboardData = createAsyncThunk(
         endpoint = '/admin/dashboard/';
       }
       
-      const response = await api.get(endpoint);
+      const response = await axios.get(endpoint);
       console.log({response})
       return response.data;
     } catch (error) {

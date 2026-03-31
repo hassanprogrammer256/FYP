@@ -45,7 +45,6 @@ const Dashboard = () => {
   const supervisorState = useSelector((state) => state.supervisor);
   const adminState = useSelector((state) => state.admin);
 
-  console.log({role,studentState,supervisorState,adminState})
   
   // Determine which data to use based on role
   let bio = null;
