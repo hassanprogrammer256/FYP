@@ -20,7 +20,6 @@ import CustomTabList from '../ui/tablist';
 import CustomTab from '../ui/tab';
 
 import {
-  ProjectSchedules,
   StudentProjectActions,
   SupervisorActions,
   AdminProjectActions,
@@ -39,13 +38,16 @@ const Dashboard = () => {
   const { role,isLoading: authLoading } = useSelector((state) => state.auth);
 
   const reg_no = localStorage.getItem('reg_no') || null;
-  
-  // Get role-specific data from store
+  const dashboardData = useSelector((state) => state.student.dashboardData)
+
   const studentState = useSelector((state) => state.student);
   const supervisorState = useSelector((state) => state.supervisor);
   const adminState = useSelector((state) => state.admin);
-
-  
+const Project_Schedules = {
+  "open": [],
+  "upcoming": [],
+  "closed:[]
+}
   // Determine which data to use based on role
   let bio = null;
   let projectReport = null;
@@ -71,7 +73,7 @@ const Dashboard = () => {
   ]);
 
   const [studentProjectStats, setStudentProjectStats] = useState([
-    { label: 'Chapters Completed', value: 0, total: 6, unit: 'chapters' },
+    { label: 'Activities Completed', value: 0, total: 6, unit: 'activities' },
     { label: 'Deadline Days Left', value: 0, unit: 'days', isWarning: false },
     { label: 'Supervisor Feedback', value: 0, unit: 'reviews' },
     { label: 'Draft Submissions', value: 0, total: 3, unit: 'submissions' },
@@ -179,8 +181,8 @@ const Dashboard = () => {
       setStudentProjectStats((prev) =>
         prev.map((item) => {
           switch (item.label) {
-            case 'Chapters Completed':
-              return { ...item, value: projectReport?.chapters_completed || 0, total: 6 };
+            case 'Activities Completed':
+              return { ...item, value: projectReport?.chapters_completed || 0, total:projectReport?.milestones.length || 0 };
             case 'Deadline Days Left':
               return { ...item, value: daysLeft, isWarning: daysLeft < 14 };
             case 'Supervisor Feedback':
@@ -193,7 +195,6 @@ const Dashboard = () => {
         })
       );
 
-      // Update milestones
       if (projectReport?.milestones) {
         setStudentMilestones(projectReport.milestones);
       }
@@ -467,16 +468,24 @@ const ProjectMilestones = ({ milestones }) => {
       </Typography>
       <Stack spacing={1} sx={{ p: 2 }}>
         {milestones?.map((milestone, idx) => (
-          <Card key={idx} variant="soft" size="sm">
+          <Card key={idx} variant="soft" size="sm" sx={{display:'flex',justifyContent:'space-between',flexDirection:'row'}}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography fontSize="1.5rem">{getStatusIcon(milestone.status)}</Typography>
-                <Typography level="body-md">{milestone.label}</Typography>
+                <Typography level="body-md">{milestone.title}</Typography>
               </Stack>
               {milestone.date && (
-                <Chip size="sm" variant="soft">{milestone.date}</Chip>
+                <Chip size="sm" variant="soft">{milestone.start_date}</Chip>
               )}
             </Stack>
+            <Chip size="sm" color={
+              milestone.status === 'completed' ? 'success' : 
+              milestone.status === 'in-progress' ? 'warning' :
+              'primary'
+            }>
+              {milestone.status.charAt(0).toUpperCase() + milestone.status.slice(1)}
+            </Chip>
+
           </Card>
         ))}
       </Stack>

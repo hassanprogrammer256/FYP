@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from django.contrib.auth import authenticate, login
-from django.db.models import Count, Avg, Q, Sum
+from django.db.models import Count, Avg, Q, Sum, Case, When, Value, CharField
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -295,18 +295,11 @@ class StudentViewSet(ModelViewSet):
             return Response({'error': 'Student ID required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            student = Student.objects.get(id=student_id)
-            
-            # Get student's project
+            student = Student.objects.get(reg_no=student_id)
             project = Project.objects.filter(
-                course=student.course,
-                faculty=student.faculty
-            ).first()
+                supervisor=student.supervisor).first()
             
-            # Calculate milestones
             milestones = self.calculate_milestones(student, project)
-            
-            # Get submissions and feedback
             submissions = Supervision.objects.filter(
                 student=student,
                 activity__project=project
@@ -334,7 +327,7 @@ class StudentViewSet(ModelViewSet):
                 'deadline_days_left': days_left,
                 'chapters_completed': chapters_completed,
                 'feedback_count': feedback_count,
-                'draft_submissions': submissions.count(),
+                # 'draft_submissions': submissions.count(),
                 'milestones': milestones
             }
             
@@ -355,7 +348,7 @@ class StudentViewSet(ModelViewSet):
             return Response({'error': 'Student ID required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            student = Student.objects.get(id=student_id)
+            student = Student.objects.get(reg_no=student_id)
             projects = Project.objects.filter(
                 course=student.course,
                 faculty=student.faculty
@@ -376,7 +369,7 @@ class StudentViewSet(ModelViewSet):
             return Response({'error': 'Student ID and Activity ID required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            student = Student.objects.get(id=student_id)
+            student = Student.objects.get(user_id=student_id)
             activity = Activity.objects.get(id=activity_id)
             
             # Check if already submitted
@@ -407,7 +400,7 @@ class StudentViewSet(ModelViewSet):
             return Response({'error': 'Student ID required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            student = Student.objects.get(id=student_id)
+            student = Student.objects.get(reg_no=student_id)
             submissions = Supervision.objects.filter(student=student)
             serializer = SupervisionSerializer(submissions, many=True)
             return Response({'submissions': serializer.data})
@@ -422,7 +415,7 @@ class StudentViewSet(ModelViewSet):
             return Response({'error': 'Student ID required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            student = Student.objects.get(id=student_id)
+            student = Student.objects.get(reg_no=student_id)
             feedbacks = Feedback.objects.filter(supervision__student=student)
             serializer = FeedbackSerializer(feedbacks, many=True)
             return Response({'feedbacks': serializer.data})
@@ -457,44 +450,25 @@ class StudentViewSet(ModelViewSet):
         ]
         
         if not project:
+            print ("No project assigned, returning default milestones")
             return milestones
-        
-        # Get completed activities
-        completed_activities = Supervision.objects.filter(
-            student=student,
-            activity__project=project,
-            status='reviewed'
-        ).select_related('activity')
-        
-        # Map activities to milestones
-        for completed in completed_activities:
-            title_lower = completed.activity.title.lower()
-            if 'proposal' in title_lower:
-                milestones[0]['status'] = 'completed'
-                milestones[0]['date'] = completed.submission_date.strftime('%Y-%m-%d')
-            elif 'literature' in title_lower:
-                milestones[1]['status'] = 'completed'
-                milestones[1]['date'] = completed.submission_date.strftime('%Y-%m-%d')
-            elif 'methodology' in title_lower:
-                milestones[2]['status'] = 'completed'
-                milestones[2]['date'] = completed.submission_date.strftime('%Y-%m-%d')
-            elif 'implementation' in title_lower:
-                milestones[3]['status'] = 'completed'
-                milestones[3]['date'] = completed.submission_date.strftime('%Y-%m-%d')
-            elif 'final' in title_lower:
-                milestones[4]['status'] = 'completed'
-                milestones[4]['date'] = completed.submission_date.strftime('%Y-%m-%d')
-        
-        return milestones
+        completed_activities = Activity.objects.filter(
+            project=project,
+        )
+        print(f"Completed activities for project {project.id}: {completed_activities.count()}")
+        all_activities = Activity.objects.filter(project=project).order_by('start_date')
+        print(f"All activities for project {project.id}: {all_activities.count()}")
+    
+        return all_activities.values('title', 'start_date','status')
     
     def count_chapters_completed(self, project):
         """Count completed chapters"""
         if not project:
             return 0
         
-        completed = Activity.objects.filter(
-            project=project,
-            supervision__status='reviewed'
+        completed = Supervision.objects.filter(
+            activity__project=project,
+            status='reviewed'
         ).count()
         
         return min(completed, 6)

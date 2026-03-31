@@ -5,37 +5,31 @@ import ListItemButton from '@mui/joy/ListItemButton'
 import { Link, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FaTimes, FaChevronRight, FaChevronLeft } from 'react-icons/fa'
+import { API_BASE_URL } from '../../config'
 
 const MotionStack = motion(Stack)
 
-const SideBar = ({ navitems, user_data, open, toggle, supervisor, role }) => {
+const SideBar = ({ navitems, bio, open, toggle, supervisor, role }) => {
   const location = useLocation()
   const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 768
 
   // Get user initials
   const getInitials = () => {
-    if (!user_data) return 'U'
-    const first = user_data.first_name?.[0] || ''
-    const last = user_data.last_name?.[0] || ''
-    return (first + last).toUpperCase() || user_data.email?.[0]?.toUpperCase() || 'U'
+    if (!bio) return 'U'
+    const first = bio.first_name?.[0] || ''
+    const last = bio.last_name?.[0] || ''
+    return (first + last).toUpperCase() || bio.email?.[0]?.toUpperCase() || 'U'
   }
 
   // Get full name
   const getFullName = () => {
-    if (!user_data) return 'User'
-    if (user_data.first_name && user_data.last_name) {
-      return `${user_data.first_name} ${user_data.last_name}`
+    if (!bio) return 'User'
+    if (bio.first_name && bio.last_name) {
+      return `${bio.first_name} ${bio.last_name}`
     }
-    return user_data.first_name || user_data.email || 'User'
+    return bio.first_name || bio.email || 'User'
   }
 
-  // Get user role display
-  const getRoleDisplay = () => {
-    if (role === 'student') return 'Student'
-    if (role === 'supervisor') return 'Supervisor'
-    if (role === 'admin') return 'Administrator'
-    return 'User'
-  }
 
   // Get avatar color based on role
   const getAvatarColor = () => {
@@ -44,7 +38,6 @@ const SideBar = ({ navitems, user_data, open, toggle, supervisor, role }) => {
     if (role === 'admin') return 'neutral'
     return 'primary'
   }
-
   return (
     <>
       <AnimatePresence>
@@ -99,6 +92,7 @@ const SideBar = ({ navitems, user_data, open, toggle, supervisor, role }) => {
               mb: 2
             }}>
               <Avatar
+              src={`${API_BASE_URL}${bio?.image}`}
                 size="lg"
                 color={getAvatarColor()}
                 sx={{ 
@@ -108,73 +102,35 @@ const SideBar = ({ navitems, user_data, open, toggle, supervisor, role }) => {
                   fontSize: '2rem',
                   backgroundColor: supervisor ? '#1a8f3f' : '#185ea5'
                 }}
-              >
-                {getInitials()}
-              </Avatar>
-              
-              <Typography level="h4" sx={{ color: 'white', fontWeight: 600, mb: 0.5 }}>
-                {getFullName()}
-              </Typography>
-              
-              <Chip 
-                size="sm" 
-                color={getAvatarColor()}
-                sx={{ 
-                  mt: 1,
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  color: 'white'
-                }}
-              >
-                {getRoleDisplay()}
-              </Chip>
-              
-              {user_data?.email && (
-                <Typography level="body-sm" sx={{ color: 'rgba(255,255,255,0.7)', mt: 1, textAlign: 'center' }}>
-                  {user_data.email}
-                </Typography>
-              )}
-              
-              {user_data?.reg_no && (
-                <Typography level="body-xs" sx={{ color: 'rgba(255,255,255,0.5)', mt: 0.5 }}>
-                  ID: {user_data.reg_no}
-                </Typography>
-              )}
+               />
+
             </Box>
 
-            {/* Navigation Items */}
-            <List sx={{ flex: 1, px: 2 }}>
-              {navitems.map((item, index) => {
-                const isActive = location.pathname === item.to
+                <List>
+              {navitems.map((e, index) => {
+                const isActive = location.pathname === e.to
                 return (
-                  <ListItem key={index} sx={{ mb: 0.5 }}>
+                  <ListItem key={index}>
                     <ListItemButton
                       component={Link}
-                      to={item.to}
+                      to={e.to}
                       onClick={toggle}
                       sx={{
+                        mb: 2,
                         borderRadius: 'md',
-                        py: 1.5,
-                        backgroundColor: 'transparent',
-                        color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
-                        '&:hover': {
-                          backgroundColor: supervisor ? 'rgba(26,143,63,0.2)' : 'rgba(24,94,165,0.2)',
-                          color: 'white'
-                        },
+                        backgroundColor: 'inherit !important',
+                        '&:hover': { backgroundColor: role === 'supervisor' ? '#00632b3f !important':'#185ea53f !important' },
                         ...(isActive && {
-                          backgroundColor: supervisor ? '#1a8f3f' : '#185ea5',
-                          '&:hover': {
-                            backgroundColor: supervisor ? '#1a8f3f' : '#185ea5',
-                          }
+                          backgroundColor: role=== 'supervisor' ?'#1a8f3f !important': '#185ea5 !important',
+                          '&:hover': { backgroundColor: role=== 'supervisor' ?'#1a8f3f !important' :'#185ea5 !important' },
                         }),
                       }}
+                      selected={isActive}
                     >
-                      <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                        <item.icon size={20} />
-                        <Typography level="body-md" sx={{ flex: 1 }}>
-                          {item.name}
-                        </Typography>
-                        {isActive && <FaChevronRight size={12} />}
-                      </Stack>
+                      <e.icon />
+                      <Typography sx={{ color: 'white', fontSize: 14, ml: 1 }}>
+                        {e.name}
+                      </Typography>
                     </ListItemButton>
                   </ListItem>
                 )
@@ -182,32 +138,22 @@ const SideBar = ({ navitems, user_data, open, toggle, supervisor, role }) => {
             </List>
 
             {/* Footer Info */}
-            <Box sx={{ 
-              p: 2, 
-              mt: 'auto',
-              borderTop: '1px solid',
-              borderColor: 'rgba(255,255,255,0.1)',
-              backgroundColor: supervisor ? 'rgba(0,99,43,0.2)' : 'rgba(24,94,165,0.2)'
-            }}>
-              <Stack spacing={1}>
-                {user_data?.course && (
-                  <Typography level="body-xs" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Course: {user_data.course}
+              <Box sx={{ bgcolor: role === 'supervisor' ? '#00632b2e' : '#185ea53f', p: 3, borderRadius: 'md', mt: 'auto' }}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar
+                  alt={`${bio?.firstName?.[0] ?? ''}${bio?.last_name?.[0] ?? ''}`}
+                  sx={{ width: 40, height: 40 }}
+                >
+                  {bio?.first_name?.[0]}{bio?.last_name?.[0]}
+                </Avatar>
+                <ListItemContent>
+                  <Typography level="title-sm" sx={{ color: 'white' }}>
+                    {bio?.first_name}
                   </Typography>
-                )}
-                {user_data?.faculty && (
-                  <Typography level="body-xs" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Faculty: {user_data.faculty}
+                  <Typography level="body-xs" noWrap sx={{ color: 'neutral.300' }}>
+                    {bio?.email}
                   </Typography>
-                )}
-                {role === 'student' && user_data?.supervisor_name && (
-                  <Typography level="body-xs" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Supervisor: {user_data.supervisor_name}
-                  </Typography>
-                )}
-                <Typography level="body-xs" sx={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', mt: 1 }}>
-                  © 2024 Project Management
-                </Typography>
+                </ListItemContent>
               </Stack>
             </Box>
           </MotionStack>

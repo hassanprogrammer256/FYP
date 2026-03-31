@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/api';
+import axios from 'axios';
 
 // Async thunks
 export const fetchSupervisorStudents = createAsyncThunk(
   'supervisor/fetchStudents',
   async (supervisorId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/supervisor/students/?supervisor_id=${supervisorId}`);
+      const response = await axios.get(`${API_BASE_URL}accounts/superviso/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch students');
@@ -18,7 +18,7 @@ export const fetchPendingReviews = createAsyncThunk(
   'supervisor/fetchPendingReviews',
   async (supervisorId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/supervisor/pending_reviews/?supervisor_id=${supervisorId}`);
+      const response = await axios.get(`${API_BASE_URL}accounts/supervisor/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch pending reviews');
@@ -30,7 +30,7 @@ export const reviewSubmission = createAsyncThunk(
   'supervisor/reviewSubmission',
   async ({ submissionId, grade, comments }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/supervisor/review_submission/', {
+      const response = await axios.post(`${API_BASE_URL}accounts/supervisor/`, {
         submission_id: submissionId,
         grade,
         comments,
@@ -46,7 +46,7 @@ export const updateSupervisorProfile = createAsyncThunk(
   'supervisor/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await api.put('/supervisor/update_profile/', profileData);
+      const response = await axios.put(`${API_BASE_URL}accounts/supervisor/`, profileData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update profile');
@@ -58,7 +58,7 @@ export const fetchSupervisorDetails = createAsyncThunk(
   'supervisor/fetchDetails',
   async (supervisorId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/supervisor/details/?supervisor_id=${supervisorId}`);
+      const response = await axios.get(`${API_BASE_URL}accounts/supervisor/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch supervisor details');

@@ -36,7 +36,7 @@ export const generateDescendingNumbers = async (length,start = Math.floor(Math.r
 export const StudentNav = [
   {
     name: "Dashboard",
-    to: "/student/dashboard", 
+    to: "/student", 
     icon: LayoutDashboard,
   },
   {

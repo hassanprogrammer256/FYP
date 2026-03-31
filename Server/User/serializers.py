@@ -113,10 +113,9 @@ class StudentSerializer(ModelSerializer):
     class Meta:
         model = Student
         fields = [
-          'reg_no','first_name', 'last_name', 
+          'reg_no','first_name', 'last_name', 'image',
             'phone_number', 'gender',
             'academic_year','password','email',
-            # Read-only detailed fields
             'course_detail', 'faculty_detail', 'supervisor_detail',
             'course_name', 'faculty_name', 'supervisor_name',
             # Write-only fields

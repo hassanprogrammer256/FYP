@@ -52,6 +52,7 @@ USER_ROLES = [
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile',null=True)
     role = models.CharField(max_length=12,editable=False,choices=USER_ROLES,default='student')
+    image = models.ImageField(_("Profile Image"),upload_to='students/profile_images/',null=True,blank=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(_("First Name"),max_length=50)
     last_name = models.CharField(_("Last Name"),max_length=50)
@@ -72,6 +73,7 @@ class Student(models.Model):
 class Supervisor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='voter_profile',null=True)
     role = models.CharField(max_length=12,editable=False,choices=USER_ROLES,default='supervisor')
+    image = models.ImageField(_("Profile Image"),upload_to='supervisors/profile_images/',null=True,blank=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(_("First Name"),max_length=50)
     last_name = models.CharField(_("Last Name"),max_length=50)
@@ -130,11 +132,13 @@ class Activity(models.Model):
         ("completed", "Completed"),
         ("rejected", "Rejected")
     ]
+    image = models.ImageField(_("Activity Image"),upload_to='activities/images/',null=True,blank=True)
     project = models.ForeignKey("Project",on_delete=models.CASCADE,related_name="Activities")
     title = models.CharField(_("Activity Title"), max_length=50,unique=True)
     description = models.TextField(_("Activity Description"))
     status = models.CharField(_("Status"),max_length=10,choices=ACTIVITY_STATUSES,default="pending")
     start_date=models.DateField(auto_now_add=True)
+    end_date=models.DateField(null=True,blank=True)
     weight = models.DecimalField(_("Weight / Credit Units"),max_digits=1,decimal_places=1,default=0.0)
     
     def __str__(self):

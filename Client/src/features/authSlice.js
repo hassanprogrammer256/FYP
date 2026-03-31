@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/api';
 import { API_BASE_URL } from '../config';
 
 // Async thunks
@@ -7,7 +6,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ username, password }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`${API_BASE_URL}accounts/login/`, { username, password });
+      const response = await axios.post(`${API_BASE_URL}accounts/login/`, { username, password });
       if (response.data.success) {
         localStorage.setItem('reg_no', response.data.user.reg_no);
         localStorage.setItem('role', response.data.user.role);

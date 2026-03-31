@@ -16,9 +16,8 @@ const Layout = ({ navitems, supervisor }) => {
   const dispatch = useDispatch()
   
   // Get auth state
-  const {role,reg_no, dashboardData, isLoading: authLoading } = useSelector((state) => state.auth)
-  
-  // Get role-specific data
+  const {role,reg_no,isLoading: authLoading } = useSelector((state) => state.auth)
+const dashboardData = useSelector((state) => state.student.dashboardData)
   const studentState = useSelector((state) => state.student)
   const supervisorState = useSelector((state) => state.supervisor)
   const adminState = useSelector((state) => state.admin)
@@ -36,23 +35,17 @@ const Layout = ({ navitems, supervisor }) => {
     }
   }
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  useEffect(() => {
+useEffect(() => {
     const fetchAllData = async () => {
       try {
-        console.log('Fetching dashboard data...')
         setIsLoading(true)
-      
         if (reg_no) {
-          console.log({reg_no})
-          const res = await dispatch(fetchDashboardData()).unwrap()
-          console.log({res})
-          // Then fetch role-specific data
+          await dispatch(fetchDashboardData()).unwrap()
           if (role === "student" && reg_no) {
             await Promise.all([
-              dispatch(fetchStudentProjects(bio.profile_id)).unwrap(),
-              dispatch(fetchSubmissions(bio.profile_id)).unwrap(),
-              dispatch(fetchFeedbacks(bio.profile_id)).unwrap()
+              dispatch(fetchStudentProjects()).unwrap(),
+              dispatch(fetchSubmissions()).unwrap(),
+              dispatch(fetchFeedbacks()).unwrap()
             ]).catch(err => console.error('Error fetching student data:', err))
           } else if (role === "supervisor" && bio.profile_id) {
             await Promise.all([
@@ -73,15 +66,8 @@ const Layout = ({ navitems, supervisor }) => {
         setIsLoading(false)
       }
     }
-    
-    if (bio?.id) {
       fetchAllData()
-    } else {
-      setIsLoading(false)
-    }
-  }, [dispatch, addToast, role, reg_no])
-
-  // Show loading while fetching data
+    }, [dispatch, addToast, role, reg_no])
   if (isLoading || authLoading) {
     return <Loading />
   }
@@ -129,7 +115,7 @@ const Layout = ({ navitems, supervisor }) => {
           <SideBar
             supervisor={supervisor}
             navitems={navitems}
-            bio_data={bio}
+            bio={bio}
             role={role}
             open={true}
             toggle={() => {}}
@@ -172,7 +158,7 @@ const Layout = ({ navitems, supervisor }) => {
               >
                 <SideBar
                   navitems={navitems}
-                  bio_data={bio}
+                  bio={bio}
                   role={role}
                   open={true}
                   supervisor={supervisor}
