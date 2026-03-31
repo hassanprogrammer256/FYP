@@ -57,7 +57,7 @@ class Student(models.Model):
     last_name = models.CharField(_("Last Name"),max_length=50)
     reg_no = models.CharField(_("Registration Number"),max_length=16,unique=True,primary_key=True)
     phone_number = models.CharField(_("Phone Number"),max_length=15,unique=True)
-    gender = models.CharField(_("Gender"),choices=GENDER_CHOICES,default = "male")
+    gender = models.CharField(_("Gender"),choices=GENDER_CHOICES,default = "male",max_length=6)
     academic_year=models.IntegerField(_("Academic Year"))
     #relationships
     faculty  = models.ForeignKey("Faculty",on_delete=models.CASCADE,related_name="Students")
@@ -77,7 +77,7 @@ class Supervisor(models.Model):
     last_name = models.CharField(_("Last Name"),max_length=50)
     reg_no = models.CharField(_("Registration Number"),max_length=16,unique=True,primary_key=True)
     phone_number = models.CharField(_("Phone Number"),max_length=15,unique=True)
-    gender = models.CharField(_("Gender"),choices=GENDER_CHOICES,default = "male")
+    gender = models.CharField(_("Gender"),choices=GENDER_CHOICES,default = "male",max_length=6)
     #relationships
     faculty  = models.ForeignKey("Faculty",on_delete=models.CASCADE,related_name="Supervisors")
     course  = models.ForeignKey("Course",on_delete=models.CASCADE,related_name="Supervisors")
