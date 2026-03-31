@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/api';
+
 
 // Async thunks
 export const fetchProjects = createAsyncThunk(
   'project/fetchProjects',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/project/');
+      const response = await axios.get(`${API_BASE_URL}accounts/projects/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch projects');
@@ -18,7 +18,7 @@ export const fetchProjectDetails = createAsyncThunk(
   'project/fetchProjectDetails',
   async (projectId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/project/${projectId}/`);
+      const response = await axios.get(`${API_BASE_URL}accounts/projects/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch project details');
@@ -30,7 +30,7 @@ export const fetchProjectActivities = createAsyncThunk(
   'project/fetchProjectActivities',
   async (projectId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/project/${projectId}/activities/`);
+      const response = await axios.get(`${API_BASE_URL}accounts/projects/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch activities');

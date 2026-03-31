@@ -26,9 +26,9 @@ const App = () => {
         element={
           isAuthenticated ? (
             role === 'student' ? (
-              <Navigate to="/student/dashboard" replace />
+              <Navigate to="/student" replace />
             ) : role === 'supervisor' ? (
-              <Navigate to="/supervisor/dashboard" replace />
+              <Navigate to="/supervisor" replace />
             ) : (
               <Navigate to="/auth" replace />
             )
@@ -42,17 +42,10 @@ const App = () => {
       <Route
         path="/student"
         element={
-          <ProtectedRoute 
-            isAuthenticated={isAuthenticated} 
-            requiredRole="student" 
-            userRole={role}
-          >
             <Layout navitems={StudentNav} supervisor={false} />
-          </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/student/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="registration" element={<Register />} />
         <Route path="results" element={<Results />} />
@@ -64,17 +57,9 @@ const App = () => {
       <Route
         path="/supervisor"
         element={
-          <ProtectedRoute 
-            isAuthenticated={isAuthenticated} 
-            requiredRole="supervisor" 
-            userRole={role}
-          >
             <Layout navitems={StaffNav} supervisor={true} />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        }>
+        <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="upload-marks" element={<Marks />} />
         <Route path="check-work" element={<FileUploadPage />} />

@@ -7,7 +7,7 @@ import { useToast } from '../ui/toast-context'
 import { useDispatch, useSelector } from 'react-redux'
 import Loading from '../ui/loading'
 import { motion, AnimatePresence } from 'framer-motion' 
-import { fetchFeedbacks, fetchStudentProjects, fetchSubmissions } from '../../features/studentSlice'
+import { fetchDashboardData, fetchFeedbacks, fetchStudentProjects, fetchSubmissions } from '../../features/studentSlice'
 import { fetchPendingReviews, fetchSupervisorStudents } from '../../features/supervisorSlice'
 
 const Layout = ({ navitems, supervisor }) => {
@@ -17,14 +17,12 @@ const Layout = ({ navitems, supervisor }) => {
   
   // Get auth state
   const {role,reg_no, dashboardData, isLoading: authLoading } = useSelector((state) => state.auth)
-  console.log({role,dashboardData,reg_no})
   
   // Get role-specific data
   const studentState = useSelector((state) => state.student)
   const supervisorState = useSelector((state) => state.supervisor)
   const adminState = useSelector((state) => state.admin)
-
-  // Determine bio based on role
+  
   let bio = null
   if (role === 'student') {
     bio = studentState.bio || dashboardData?.bio
